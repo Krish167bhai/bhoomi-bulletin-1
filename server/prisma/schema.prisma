@@ -1,0 +1,421 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  USER
+  BROKER
+  AGENT
+  ADMIN
+}
+
+enum VerificationStatus {
+  NONE
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum PropertyType {
+  APARTMENT
+  VILLA
+  HOUSE
+  PLOT_LAND
+  SHOP
+  OFFICE
+  WAREHOUSE
+  COMMERCIAL
+  OTHER
+}
+
+enum ListingType {
+  BUY
+  RENT
+  INVEST
+}
+
+enum UserType {
+  OWNER
+  BROKER
+  AGENT
+}
+
+enum PropertyStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  EXPIRED
+  ARCHIVED
+}
+
+enum AdDuration {
+  WEEK_1
+  MONTH_1
+  MONTH_2
+  MONTH_3
+  MONTH_6
+  YEAR_1
+  YEAR_2
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  FOLLOW_UP
+  QUALIFIED
+  CONVERTED
+  CLOSED
+}
+
+enum ArticleCategory {
+  NEWS
+  REAL_ESTATE
+  VIDEO_NEWS
+  ANNOUNCEMENT
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id                 String              @id @default(uuid())
+  name               String
+  email              String              @unique
+  phone              String              @unique
+  passwordHash       String
+  role               Role                @default(USER)
+  userType           UserType            @default(OWNER)
+  isPhoneVerified    Boolean             @default(false)
+  isEmailVerified    Boolean             @default(false)
+  verificationStatus VerificationStatus  @default(NONE)
+  verificationDocs   String?             // JSON string or file path
+  avatar             String?
+  bio                String?
+  companyName        String?
+  licenseNumber      String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  properties         Property[]
+  articles           Article[]
+  enquiriesSent      Enquiry[]           @relation("EnquiriesSent")
+  enquiriesReceived  Enquiry[]           @relation("EnquiriesReceived")
+  requirements       PropertyRequirement[]
+  savedSearches      SavedSearch[]
+  favourites         FavouriteProperty[]
+  reviews            Review[]
+  notifications      Notification[]
+  resetTokens        PasswordResetToken[]
+  changeRequests     InformationChangeRequest[]
+  uploadedMedia      MediaItem[]
+  leadNotes          LeadNote[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([role])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+
+model InformationChangeRequest {
+  id             String    @id @default(uuid())
+  userId         String
+  requestedName  String?
+  requestedEmail String?
+  requestedPhone String?
+  reason         String?
+  status         String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  adminNotes     String?
+  createdAt      DateTime  @default(now())
+  resolvedAt     DateTime?
+
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Property {
+  id                 String              @id @default(uuid())
+  userId             String
+  title              String
+  slug               String              @unique
+  description        String
+  propertyType       PropertyType
+  listingType        ListingType         @default(BUY)
+  userType           UserType            @default(OWNER)
+  price              Float
+  priceNegotiable    Boolean             @default(false)
+  location           String
+  city               String
+  state              String?
+  pincode            String?
+  sizeSqFt           Float
+  bedrooms           Int?
+  bathrooms          Int?
+  furnishing         String?             // Furnished, Semi-Furnished, Unfurnished
+  features           String?             // JSON string array
+  amenities          String?             // JSON string array
+  additionalInfo     String?
+  
+  photos             String              @default("[]") // JSON string array of URLs
+  videoUrl           String?
+  featuredImage      String?
+
+  status             PropertyStatus      @default(PENDING_APPROVAL)
+  isPublished        Boolean             @default(false)
+  publishedAt        DateTime?
+
+  verificationStatus VerificationStatus  @default(NONE)
+  verifiedAt         DateTime?
+  verificationNotes  String?
+
+  isAdvertisement    Boolean             @default(true)
+  adDuration         AdDuration          @default(MONTH_1)
+  adStartDate        DateTime?
+  adExpiryDate       DateTime?
+  isFeatured         Boolean             @default(false)
+  isBoosted          Boolean             @default(false)
+
+  viewsCount         Int                 @default(0)
+  phoneClicks        Int                 @default(0)
+  whatsappClicks     Int                 @default(0)
+
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enquiries          Enquiry[]
+  favourites         FavouriteProperty[]
+  reviews            Review[]
+
+  @@index([userId])
+  @@index([slug])
+  @@index([status])
+  @@index([propertyType])
+  @@index([city])
+  @@index([price])
+  @@index([isAdvertisement, adExpiryDate])
+}
+
+model Article {
+  id            String          @id @default(uuid())
+  authorId      String
+  title         String
+  slug          String          @unique
+  category      ArticleCategory @default(NEWS)
+  content       String
+  excerpt       String?
+  featuredImage String?
+  videoUrl      String?
+  tags          String?         // JSON string array
+  isPublished   Boolean         @default(true)
+  publishedAt   DateTime        @default(now())
+  viewsCount    Int             @default(0)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  author        User            @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([slug])
+  @@index([category])
+  @@index([isPublished])
+}
+
+model PropertyRequirement {
+  id                String       @id @default(uuid())
+  userId            String?
+  name              String
+  email             String
+  phone             String
+  type              ListingType  @default(BUY)
+  propertyType      PropertyType
+  preferredLocation String
+  budgetMin         Float?
+  budgetMax         Float?
+  preferredSize     String?
+  additionalDetails String?
+  status            LeadStatus   @default(NEW)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  user              User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  notes             LeadNote[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Enquiry {
+  id               String       @id @default(uuid())
+  propertyId       String
+  userId           String?      // sender user if logged in
+  ownerAgentId     String       // owner/broker receiving enquiry
+  name             String
+  email            String
+  phone            String
+  message          String
+  preferredContact String       @default("PHONE") // PHONE, EMAIL, WHATSAPP
+  status           LeadStatus   @default(NEW)
+  source           String       @default("WEBSITE")
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  property         Property     @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  senderUser       User?        @relation("EnquiriesSent", fields: [userId], references: [id], onDelete: SetNull)
+  receiverUser     User         @relation("EnquiriesReceived", fields: [ownerAgentId], references: [id], onDelete: Cascade)
+  notes            LeadNote[]
+
+  @@index([propertyId])
+  @@index([userId])
+  @@index([ownerAgentId])
+  @@index([status])
+}
+
+model LeadNote {
+  id             String               @id @default(uuid())
+  authorId       String
+  enquiryId      String?
+  requirementId  String?
+  note           String
+  actionType     String               @default("NOTE") // NOTE, CALL, MEETING, EMAIL, STATUS_CHANGE
+  nextFollowUp   DateTime?
+  createdAt      DateTime             @default(now())
+
+  author         User                 @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  enquiry        Enquiry?             @relation(fields: [enquiryId], references: [id], onDelete: Cascade)
+  requirement    PropertyRequirement? @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+
+  @@index([enquiryId])
+  @@index([requirementId])
+  @@index([authorId])
+}
+
+model FavouriteProperty {
+  id         String    @id @default(uuid())
+  userId     String
+  propertyId String
+  createdAt  DateTime  @default(now())
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property   Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, propertyId])
+  @@index([userId])
+  @@index([propertyId])
+}
+
+model SavedSearch {
+  id              String    @id @default(uuid())
+  userId          String
+  name            String
+  filters         String    // JSON string containing search parameters
+  alertsActive    Boolean   @default(true)
+  lastAlertSentAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Review {
+  id         String       @id @default(uuid())
+  userId     String
+  propertyId String?
+  agentId    String?
+  rating     Int          // 1 to 5
+  title      String?
+  content    String
+  status     ReviewStatus @default(PENDING)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property   Property?    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([propertyId])
+  @@index([agentId])
+  @@index([status])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String?  // null means broadcast to all admins
+  title     String
+  message   String
+  type      String   @default("INFO") // INFO, SUCCESS, WARNING, ALERT
+  link      String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model AnalyticsEvent {
+  id         String   @id @default(uuid())
+  eventType  String   // PAGE_VIEW, PROPERTY_VIEW, ARTICLE_VIEW, ENQUIRY_CLICK, PHONE_CLICK, WHATSAPP_CLICK, SEARCH, FAVOURITE, COMPARE
+  targetId   String?  // propertyId or articleId
+  targetType String?  // PROPERTY, ARTICLE, PAGE
+  userId     String?
+  ipAddress  String?
+  userAgent  String?
+  metadata   String?  // JSON string
+  createdAt  DateTime @default(now())
+
+  @@index([eventType])
+  @@index([targetId])
+  @@index([createdAt])
+}
+
+model MediaItem {
+  id           String   @id @default(uuid())
+  uploaderId   String?
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int
+  url          String
+  mediaType    String   @default("IMAGE") // IMAGE, VIDEO, DOCUMENT
+  createdAt    DateTime @default(now())
+
+  uploader     User?    @relation(fields: [uploaderId], references: [id], onDelete: SetNull)
+
+  @@index([mediaType])
+  @@index([uploaderId])
+}
+
+model SiteSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String   // text or JSON string
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+}
