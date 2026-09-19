@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import api from "../../api/client.js";
 import { Eye, MessageSquare, Phone, Send, BarChart2 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
@@ -12,7 +12,7 @@ export const AdAnalytics: React.FC = () => {
     try {
       setLoading(true);
       const res = await api.get(`/analytics/my-ads?days=${period}`);
-      const list = res.data.data || res.data || [];
+      const list = res.data.analytics?.properties || res.data.data || (Array.isArray(res.data) ? res.data : []);
       setData(list);
     } catch (err) {
       console.error("Failed to load ad analytics", err);

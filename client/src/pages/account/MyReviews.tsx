@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import api from "../../api/client.js";
 import { Star, Trash2, Calendar, AlertCircle } from "lucide-react";
 
@@ -9,7 +9,7 @@ export const MyReviews: React.FC = () => {
   const fetchReviews = async () => {
     try {
       const res = await api.get("/reviews?mine=true");
-      setReviews(res.data.data || res.data || []);
+      setReviews(res.data.reviews || res.data.data || (Array.isArray(res.data) ? res.data : []));
     } catch (err) {
       console.error("Failed to load reviews", err);
     } finally {

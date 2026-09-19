@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/client.js";
 import { Search, Bell, BellOff, Trash2, ArrowRight, AlertCircle } from "lucide-react";
@@ -11,7 +11,7 @@ export const MySavedSearches: React.FC = () => {
   const fetchSearches = async () => {
     try {
       const res = await api.get("/saved-searches");
-      setSearches(res.data.data || res.data || []);
+      setSearches(res.data.searches || res.data.data || (Array.isArray(res.data) ? res.data : []));
     } catch (err) {
       console.error("Failed to fetch saved searches", err);
     } finally {

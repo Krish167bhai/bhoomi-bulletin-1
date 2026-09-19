@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../../api/client.js";
 import { PropertyCard } from "../../components/property/PropertyCard.js";
@@ -11,7 +11,7 @@ export const MyFavourites: React.FC = () => {
   const fetchFavourites = async () => {
     try {
       const res = await api.get("/properties/favourites");
-      const list = res.data.data || res.data || [];
+      const list = res.data.favourites || res.data.data || (Array.isArray(res.data) ? res.data : []);
       setFavourites(list);
     } catch (err) {
       console.error("Failed to load favourites", err);

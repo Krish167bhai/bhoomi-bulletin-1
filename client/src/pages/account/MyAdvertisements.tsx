@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../../api/client.js";
 import { PlusCircle, Eye, Calendar, Trash2, ExternalLink, Clock, AlertCircle } from "lucide-react";
@@ -12,7 +12,7 @@ export const MyAdvertisements: React.FC = () => {
   const fetchProperties = async () => {
     try {
       const res = await api.get("/properties?createdBy=me");
-      const list = res.data.data || res.data || [];
+      const list = res.data.properties || res.data.data || (Array.isArray(res.data) ? res.data : []);
       setProperties(list);
     } catch (err) {
       console.error("Failed to load user properties", err);

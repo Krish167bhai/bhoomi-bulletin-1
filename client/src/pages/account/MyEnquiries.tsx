@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import api from "../../api/client.js";
 import { MessageSquare, Phone, Mail, Clock, CheckCircle2, AlertCircle, Building2 } from "lucide-react";
 
@@ -15,8 +15,8 @@ export const MyEnquiries: React.FC = () => {
         api.get("/enquiries/received"),
         api.get("/enquiries/sent"),
       ]);
-      setReceived(recRes.data.data || recRes.data || []);
-      setSent(sentRes.data.data || sentRes.data || []);
+      setReceived(recRes.data.enquiries || recRes.data.data || (Array.isArray(recRes.data) ? recRes.data : []));
+      setSent(sentRes.data.enquiries || sentRes.data.data || (Array.isArray(sentRes.data) ? sentRes.data : []));
     } catch (err) {
       console.error("Failed to load enquiries", err);
     } finally {
