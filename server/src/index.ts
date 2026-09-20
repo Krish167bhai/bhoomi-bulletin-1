@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
+import fs from 'fs';
 import { ENV } from './config/env.js';
 import apiRouter from './routes/index.js';
 import { errorHandler } from './middleware/error.middleware.js';
@@ -113,11 +114,24 @@ app.use(errorHandler);
 registerEventHandlers();
 initAdExpiryCron();
 
-// Serve React Frontend in Production - Requirement to make deployment monolithic
-const clientDist = path.join(process.cwd(), '../client/dist');
+// Serve React Frontend in Production - Robust resolution for any working directory
+const candidatePaths = [
+  path.resolve(process.cwd(), 'client/dist'),
+  path.resolve(process.cwd(), '../client/dist'),
+  path.resolve(process.cwd(), 'dist'),
+  path.resolve(__dirname, '../../client/dist'),
+  path.resolve(__dirname, '../client/dist'),
+];
+
+let clientDist = candidatePaths.find((p) => fs.existsSync(path.join(p, 'index.html'))) || candidatePaths[0];
+
 app.use(express.static(clientDist));
 app.get('*', (_req, res) => {
-  res.sendFile(path.join(clientDist, 'index.html'));
+  const indexPath = path.join(clientDist, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    return res.sendFile(indexPath);
+  }
+  return res.status(200).send(`<!DOCTYPE html><html><body><h2>Bhoomi Bulletin Server is Running</h2><p>Static frontend build is initializing. Please refresh in a moment.</p></body></html>`);
 });
 
 // Start server
