@@ -113,6 +113,13 @@ app.use(errorHandler);
 registerEventHandlers();
 initAdExpiryCron();
 
+// Serve React Frontend in Production - Requirement to make deployment monolithic
+const clientDist = path.join(process.cwd(), '../client/dist');
+app.use(express.static(clientDist));
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(clientDist, 'index.html'));
+});
+
 // Start server
 app.listen(ENV.PORT, () => {
   console.log(`====================================================`);
