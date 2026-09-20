@@ -1,42 +1,43 @@
 {
-  "name": "bhoomi-bulletin-server",
-  "version": "1.0.0",
-  "description": "Backend API server for Bhoomi Bulletin",
-  "main": "dist/index.js",
-  "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "prisma generate && tsc",
-    "start": "node dist/index.js",
-    "prisma:generate": "prisma generate",
-    "prisma:push": "prisma db push",
-    "prisma:studio": "prisma studio",
-    "seed": "tsx src/prisma/seed.ts"
-  },
-  "dependencies": {
-    "@prisma/client": "^6.4.1",
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "express-rate-limit": "^7.5.0",
-    "helmet": "^8.0.0",
-    "jsonwebtoken": "^9.0.2",
-    "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.1",
-    "node-cron": "^3.0.3",
-    "zod": "^3.24.2"
-  },
-  "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
-    "@types/jsonwebtoken": "^9.0.8",
-    "@types/morgan": "^1.9.9",
-    "@types/multer": "^1.4.12",
-    "@types/node": "^22.13.4",
-    "@types/node-cron": "^3.0.11",
-    "prisma": "^6.4.1",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.3"
-  }
+    "name":  "bhoomi-bulletin-server",
+    "version":  "1.0.0",
+    "description":  "Backend API server for Bhoomi Bulletin",
+    "main":  "dist/index.js",
+    "scripts":  {
+                    "dev":  "tsx watch src/index.ts",
+                    "build":  "prisma generate \u0026\u0026 tsc",
+                    "start":  "node dist/index.js",
+                    "prisma:generate":  "prisma generate",
+                    "prisma:push":  "prisma db push",
+                    "prisma:studio":  "prisma studio",
+                    "seed":  "tsx src/prisma/seed.ts"
+                },
+    "dependencies":  {
+                         "@types/bcryptjs":  "^2.4.6",
+                         "multer":  "^1.4.5-lts.1",
+                         "prisma":  "^6.4.1",
+                         "@types/node-cron":  "^3.0.11",
+                         "@types/morgan":  "^1.9.9",
+                         "@types/express":  "^5.0.0",
+                         "typescript":  "^5.7.3",
+                         "@types/jsonwebtoken":  "^9.0.8",
+                         "cors":  "^2.8.5",
+                         "dotenv":  "^16.4.7",
+                         "@types/cors":  "^2.8.17",
+                         "morgan":  "^1.10.0",
+                         "bcryptjs":  "^2.4.3",
+                         "zod":  "^3.24.2",
+                         "@prisma/client":  "^6.4.1",
+                         "express":  "^4.21.2",
+                         "@types/node":  "^22.13.4",
+                         "jsonwebtoken":  "^9.0.2",
+                         "@types/multer":  "^1.4.12",
+                         "express-rate-limit":  "^7.5.0",
+                         "node-cron":  "^3.0.3",
+                         "helmet":  "^8.0.0",
+                         "tsx":  "^4.19.2"
+                     },
+    "devDependencies":  {
+
+                        }
 }
