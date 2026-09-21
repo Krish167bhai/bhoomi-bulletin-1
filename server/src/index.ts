@@ -149,7 +149,7 @@ const startServer = async () => {
   } catch (err) {
     console.error('Failed to auto-seed:', err);
   }
-  app.listen(ENV.PORT, () => {
+  app.listen(Number(ENV.PORT), '0.0.0.0', () => {
     console.log(`====================================================`);
     console.log(`🚀 BHOOMI BULLETIN API Server running on port ${ENV.PORT}`);
     console.log(`📡 Environment: ${ENV.NODE_ENV}`);
