@@ -142,20 +142,16 @@ app.get('*', (_req, res) => {
   return res.status(200).send(`<!DOCTYPE html><html><body><h2>Bhoomi Bulletin Server is Running</h2><p>Static frontend build is initializing. Please refresh in a moment.</p></body></html>`);
 });
 
-// Start server
-const startServer = async () => {
-  try {
-    await autoSeedIfEmpty();
-  } catch (err) {
-    console.error('Failed to auto-seed:', err);
-  }
-  app.listen(Number(ENV.PORT), '0.0.0.0', () => {
-    console.log(`====================================================`);
-    console.log(`🚀 BHOOMI BULLETIN API Server running on port ${ENV.PORT}`);
-    console.log(`📡 Environment: ${ENV.NODE_ENV}`);
-    console.log(`🗄️ Database: SQLite (Prisma)`);
-    console.log(`====================================================`);
-  });
-};
+// Start server immediately for Passenger compatibility
+app.listen(ENV.PORT, () => {
+  console.log(`====================================================`);
+  console.log(`🚀 BHOOMI BULLETIN API Server running on port ${ENV.PORT}`);
+  console.log(`📡 Environment: ${ENV.NODE_ENV}`);
+  console.log(`🗄️ Database: SQLite (Prisma)`);
+  console.log(`====================================================`);
 
-startServer();
+  // Run auto-seed safely in background if needed
+  autoSeedIfEmpty().catch((err) => {
+    console.error('Auto-seed check note:', err?.message || err);
+  });
+});
