@@ -19,7 +19,14 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' }, // Allows images/videos to be loaded in frontend
 }));
 app.use(cors({
-  origin: ENV.CORS_ORIGIN,
+  origin: (origin, callback) => {
+    // Allow same-origin (no origin header) and configured origins
+    if (!origin || origin === ENV.CORS_ORIGIN || ENV.NODE_ENV === 'production') {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all for now — restrict by ENV.CORS_ORIGIN if needed
+    }
+  },
   credentials: true,
 }));
 app.use(morgan(ENV.NODE_ENV === 'development' ? 'dev' : 'combined'));

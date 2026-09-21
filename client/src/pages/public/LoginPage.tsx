@@ -99,13 +99,7 @@ export const LoginPage: React.FC = () => {
           </button>
         </form>
 
-        {/* Quick Demo Credentials helper */}
-        <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-[11px] text-slate-500 space-y-1">
-          <div className="font-bold text-slate-700">Quick Test Logins:</div>
-          <div>Admin: <code className="text-slate-800 font-mono">admin@bhoomibulletin.com</code> / <code className="text-slate-800 font-mono">Admin@123456</code></div>
-          <div>Broker: <code className="text-slate-800 font-mono">rajesh.broker@bhoomibulletin.com</code> / <code className="text-slate-800 font-mono">User@123456</code></div>
-          <div>User: <code className="text-slate-800 font-mono">vikram.singh@gmail.com</code> / <code className="text-slate-800 font-mono">User@123456</code></div>
-        </div>
+
 
         <div className="text-center pt-2 text-xs text-slate-600">
           Don't have an account?{' '}
