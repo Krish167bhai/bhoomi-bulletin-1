@@ -11,6 +11,7 @@ import { apiLimiter } from './middleware/rateLimiter.js';
 import { registerEventHandlers } from './events/handlers.js';
 import { initAdExpiryCron } from './jobs/adExpiry.job.js';
 import { prisma } from './config/prisma.js';
+import { autoSeedIfEmpty } from './prisma/auto-seed.js';
 
 const app = express();
 
@@ -142,10 +143,19 @@ app.get('*', (_req, res) => {
 });
 
 // Start server
-app.listen(ENV.PORT, () => {
-  console.log(`====================================================`);
-  console.log(`🚀 BHOOMI BULLETIN API Server running on port ${ENV.PORT}`);
-  console.log(`📡 Environment: ${ENV.NODE_ENV}`);
-  console.log(`🗄️ Database: SQLite (Prisma)`);
-  console.log(`====================================================`);
-});
+const startServer = async () => {
+  try {
+    await autoSeedIfEmpty();
+  } catch (err) {
+    console.error('Failed to auto-seed:', err);
+  }
+  app.listen(ENV.PORT, () => {
+    console.log(`====================================================`);
+    console.log(`🚀 BHOOMI BULLETIN API Server running on port ${ENV.PORT}`);
+    console.log(`📡 Environment: ${ENV.NODE_ENV}`);
+    console.log(`🗄️ Database: SQLite (Prisma)`);
+    console.log(`====================================================`);
+  });
+};
+
+startServer();
