@@ -1,12 +1,10 @@
-﻿# Dependencies
+# Dependencies
 node_modules/
 client/node_modules/
 server/node_modules/
 
-# Production build outputs
-dist/
+# Production build outputs (client/dist is synced to root dist/)
 client/dist/
-server/dist/
 
 # Environment files
 .env

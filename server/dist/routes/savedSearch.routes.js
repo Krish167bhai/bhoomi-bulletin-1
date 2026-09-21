@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const savedSearch_controller_js_1 = require("../controllers/savedSearch.controller.js");
+const auth_middleware_js_1 = require("../middleware/auth.middleware.js");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_js_1.authenticate);
+router.post('/', savedSearch_controller_js_1.SavedSearchController.createSavedSearch);
+router.get('/my', savedSearch_controller_js_1.SavedSearchController.getMySavedSearches);
+router.patch('/:id/toggle-alerts', savedSearch_controller_js_1.SavedSearchController.toggleAlertStatus);
+router.delete('/:id', savedSearch_controller_js_1.SavedSearchController.deleteSavedSearch);
+exports.default = router;
